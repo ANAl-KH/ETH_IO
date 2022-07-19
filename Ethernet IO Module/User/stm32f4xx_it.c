@@ -43,23 +43,9 @@
 #include "input_exti.h"
 #include "bsp_led.h"
 
-#include "FreeRTOS.h"					//FreeRTOS使用		  
+#include "FreeRTOS.h"						  
 #include "task.h" 
 
-/** @addtogroup STM32F4xx_HAL_Examples
-  * @{
-  */
-
-/** @addtogroup GPIO_EXTI
-  * @{
-  */
-
-/* Private typedef -----------------------------------------------------------*/
-/* Private define ------------------------------------------------------------*/
-/* Private macro -------------------------------------------------------------*/
-/* Private variables ---------------------------------------------------------*/
-/* Private function prototypes -----------------------------------------------*/
-/* Private functions ---------------------------------------------------------*/
 
 /******************************************************************************/
 /*            Cortex-M4 Processor Exceptions Handlers                         */
@@ -79,13 +65,7 @@ void NMI_Handler(void)
   * @param  None
   * @retval None
   */
-//void HardFault_Handler(void)
-//{
-//  /* Go to infinite loop when Hard Fault exception occurs */
-//  while (1)
-//  {
-//  }
-//}
+
 
 /**
   * @brief  This function handles Memory Manage exception.
@@ -131,9 +111,7 @@ void UsageFault_Handler(void)
   * @param  None
   * @retval None
   */
-//void SVC_Handler(void)
-//{
-//}
+
 
 /**
   * @brief  This function handles Debug Monitor exception.
@@ -149,9 +127,7 @@ void DebugMon_Handler(void)
   * @param  None
   * @retval None
   */
-//void PendSV_Handler(void)
-//{
-//}
+
 
 /**
   * @brief  This function handles SysTick Handler.
@@ -189,10 +165,11 @@ void SysTick_Handler(void)
 
 /**
   * @brief  This function handles External line 0 interrupt request.
-  * @param  None
-  * @retval None
+  * @param  
+  * @retval 
   */
 
+//两个输入引脚状态变化的中断
 void INPUT1_IRQHandler(void)
 {
 	HAL_GPIO_EXTI_IRQHandler(INPUT1_PIN);
@@ -202,6 +179,8 @@ void INPUT2_IRQHandler(void)
   HAL_GPIO_EXTI_IRQHandler(INPUT2_PIN);
 }
 
+
+//串口DMA传输的空闲中断
 extern uint8_t Rxflag;
 
 void DEBUG_USART_IRQHandler(void)

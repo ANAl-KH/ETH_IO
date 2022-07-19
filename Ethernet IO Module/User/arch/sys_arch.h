@@ -41,10 +41,6 @@
 #include "semphr.h"
 
 /* USER CODE BEGIN 0 */
-#define DEST_IP_ADDR0               192
-#define DEST_IP_ADDR1               168
-#define DEST_IP_ADDR2                 2
-#define DEST_IP_ADDR3               187
 
 #define DEST_PORT                  1000
 

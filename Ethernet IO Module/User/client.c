@@ -39,17 +39,16 @@
 #include "lwip/sys.h"
 #include "lwip/api.h"
 
-//#include "tasks.h"
 
 TaskHandle_t Ethsend_Task_Handle;
 TaskHandle_t Ethrecv_Task_Handle;
+
 uint16_t ip_addr0 , ip_addr1 ,ip_addr2 ,ip_addr3 ,ip_port;
 
 static  struct netconn *conn;
 
 static void client(void *thread_param)
 {
-//  struct netconn *conn;
   int ret;
   ip4_addr_t ipaddr;
 	uint16_t NotifyValue;
@@ -61,17 +60,12 @@ static void client(void *thread_param)
 	uint8_t send_buf4[]= "Input1 is low,Input2 is low.\n";
 	
 
-//  printf("目地IP地址:%d.%d.%d.%d \t 端口号:%d\n\n",      \
-//          DEST_IP_ADDR0,DEST_IP_ADDR1,DEST_IP_ADDR2,DEST_IP_ADDR3,DEST_PORT);
 	  printf("目地IP地址:%d.%d.%d.%d \t 端口号:%d\n",      \
           ip_addr0,ip_addr1,ip_addr2,ip_addr3,ip_port);
   
-//  printf("请将电脑上位机设置为TCP Server.在User/arch/sys_arch.h文件中将目标IP地址修改为您电脑上的IP地址\n\n");
-
-//  printf("修改对应的宏定义:DEST_IP_ADDR0,DEST_IP_ADDR1,DEST_IP_ADDR2,DEST_IP_ADDR3,DEST_PORT\n\n");
-
   while(1)
   {
+		//与上位机建立TCP连接
     conn = netconn_new(NETCONN_TCP);
     if (conn == NULL)
     {
@@ -95,15 +89,13 @@ static void client(void *thread_param)
      
     while (1)
     {
-			NotifyValue=ulTaskNotifyTake(pdTRUE,portMAX_DELAY);	//获取任务通知
+			//上位机发送命令查询输入状态时，clientrecv会发送任务通知到本函数
+			//输入事件触发功能，输入引脚的电平发生变化时GPIO中断会发送任务通知到本函数
+			//定时器任务每秒发送一次任务通知到本函数
+			//收到任务通知后本函数会向上位机发送一次输入引脚状态信息
+			NotifyValue=ulTaskNotifyTake(pdTRUE,portMAX_DELAY);	
 		  if(NotifyValue!=0)	//清零之前的任务通知值不为0，说明任务通知有效
-		  {
-				  /*
-				  switch扩展性不太好，可以改成用strcat拼字符串最后发送
-          char send_bufx[] = "拼接的字符串";
-				  ret = netconn_write(conn,&send_bufx,sizeof(send_bufx),0);
-				  */
-					switch(Input_Scan()){
+		  {		switch(Input_Scan()){
 					case 11  :
 					ret = netconn_write(conn,send_buf1,sizeof(send_buf1),0);
 					break;
@@ -118,31 +110,26 @@ static void client(void *thread_param)
 					break;
 					}
 			}
-//      ret = netconn_write(conn,send_buf,sizeof(send_buf),0);
-//   
-//      vTaskDelay(1000);
     }
   }
 
 }
 
-
+//接收并解析上位机的命令
 static void clientrecv(void *thread_param)
 {
 	struct netbuf *recv_buf;
-//	void *data;
-//  u16_t len;
 	err_t err;
   char msg[100];
+	//控制输出的命令
 	char *LED1recv = "LED1";
 	char *LED2recv = "LED2";
 	char *LED3recv = "LED3";
+	//查询输入引脚状态的命令
 	char *queryrecv = "query";
 	
 			while ((err = netconn_recv(conn, &recv_buf)) == 0) {
         do {
-//             netbuf_data(recv_buf, &data, &len);
-//             err = netconn_write(conn, data, len, NETCONN_COPY);
 					   strncpy (msg, recv_buf->p->payload, recv_buf->p->len);
 					   if(strncmp(msg,LED1recv,4) == 0)
 						 {
@@ -155,9 +142,6 @@ static void clientrecv(void *thread_param)
 							 xTaskNotifyGive( Ethsend_Task_Handle );
 						 }
 						 memset (msg, '\0', 100);
-//				   	 printf("%s\n\n",data);
-//						 printf("%s\n\n",msg);
-//				  	 printf("%u\n\n",len);
         } while (netbuf_next(recv_buf) >= 0);
         netbuf_delete(recv_buf);
       }

@@ -261,7 +261,7 @@ uint32_t I2C_EE_BufferRead(uint8_t* pBuffer, uint8_t ReadAddr, uint16_t NumByteT
 	return status;
 }
 
-#define  DATA_Size			20
+#define  DATA_Size			20  //IP端口配置信息最长为20字节，所以设置20字节就够了
 #define  EEP_Firstpage      0x00
 uint8_t I2c_Buf_Write[DATA_Size];
 uint8_t I2c_Buf_Read[DATA_Size];
@@ -273,10 +273,6 @@ uint8_t I2c_Buf_Read[DATA_Size];
   */
 uint8_t I2C_Read_EE_IP(void)
 {
-	//将I2c_Buf_Write中顺序递增的数据写入EERPOM中 
-//	I2C_EE_BufferWrite( I2c_Buf_Write, EEP_Firstpage, DATA_Size);
-
-	//将EEPROM读出数据顺序保持到I2c_Buf_Read中
 	I2C_EE_BufferRead(I2c_Buf_Read, EEP_Firstpage, DATA_Size); 
 	if (sscanf((char *)I2c_Buf_Read, "%d.%d.%d.%d:%d", &ip_addr0,&ip_addr1,&ip_addr2,&ip_addr3,&ip_port) == 5)
 	{
@@ -289,13 +285,13 @@ uint8_t I2C_Read_EE_IP(void)
 }
 
 /**
-  * @brief  从EEPROM中读取IP端口地址
+  * @brief  向EEPROM中写入IP端口地址配置信息
   * @param  
   * @retval 
   */
 uint8_t I2C_Write_EE_IP(uint8_t *Usart_Ip_data)
 {
-	//将I2c_Buf_Write中顺序递增的数据写入EERPOM中 
+	//将配置信息写入EERPOM中 
 	I2C_EE_BufferWrite( Usart_Ip_data, EEP_Firstpage, DATA_Size);
 	printf("成功将串口收到的IP端口配置%s写入EEPROM！\n请重启以生效\n",Usart_Ip_data);
 	return 1;

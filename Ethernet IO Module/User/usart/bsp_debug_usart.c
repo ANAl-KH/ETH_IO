@@ -140,6 +140,8 @@ void USART_Init(void)
 }
 
 
+
+//串口DMA传输空闲中断回调函数，会向I2ceeprom_Task发送任务通知
 extern TaskHandle_t I2ceeprom_Task_Handle;
 
 void HAL_UART_AbortReceiveCpltCallback(UART_HandleTypeDef *huart)
@@ -147,7 +149,6 @@ void HAL_UART_AbortReceiveCpltCallback(UART_HandleTypeDef *huart)
 	if(huart == &UartHandle)
 	{
 		BaseType_t pxHigherPriorityTaskWoken;
-//    printf("中断回调函数调用了一次！");
 		vTaskNotifyGiveFromISR(I2ceeprom_Task_Handle,&pxHigherPriorityTaskWoken);//发送任务通知
 		portYIELD_FROM_ISR(pxHigherPriorityTaskWoken);//如果需要的话进行一次任务切换
 		HAL_UART_Receive_DMA(&UartHandle,Usart_Rx_Buf,USART_RBUFF_SIZE);//重新开始DMA接收

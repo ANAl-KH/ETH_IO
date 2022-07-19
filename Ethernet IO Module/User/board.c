@@ -4,7 +4,7 @@
   * @author  fire
   * @version V1.0
   * @date    2017-xx-xx
-  * @brief   GPIO输出--使用固件库点亮LED灯
+  * @brief   
   ******************************************************************************
   * @attention
   *
@@ -34,7 +34,8 @@ static void GPIO_CLK_Init(void);
 
 void BSP_Init(void)
 {
-  HAL_Init();    
+  HAL_Init();   
+	
   GPIO_CLK_Init();
   
   SystemClock_Config();
@@ -45,7 +46,7 @@ void BSP_Init(void)
 	Input_GPIO_Config();
 	//初始化输入中断
 	INPUT_EXTI_Init();
-  /*初始化USART 配置模式为 115200 8-N-1，中断接收*/
+  /*初始化USART 配置模式为 115200 8-N-1，DMA传输，空闲中断*/
   USART_Init();
 	//I2C EEPROM
 	I2C_EE_Init();

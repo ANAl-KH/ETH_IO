@@ -26,8 +26,7 @@ void INPUT_EXTI_Init(void)
 }
 
 
-	//中断服务程序中需要做的事情
-  //在HAL库中所有的外部中断服务函数都会调用此函数
+//输入引脚的电平发生变化时会触发中断调用此回调函数，向Ethsend_Task发送任务通知
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
 	BaseType_t xHigherPriorityTaskWoken;
